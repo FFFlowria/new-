@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT新闻轮播 + 数据库学习列表</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft Yahei", sans-serif;
+        }
+        body {
+            background-color: #f5f7fa;
+            padding: 20px;
+        }
+        .page-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 20px;
+        }
+        /* 左侧轮播区域 */
+        .carousel-section {
+            flex: 2;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .carousel {
+            position: relative;
+            height: 400px;
+            overflow: hidden;
+        }
+        .carousel-item {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+        .carousel-item.active {
+            opacity: 1;
+        }
+        .carousel-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .carousel-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            padding: 15px;
+        }
+        .carousel-caption h3 {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+        .carousel-caption p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .carousel-nav {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            display: flex;
+            gap: 8px;
+        }
+        .carousel-nav span {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            cursor: pointer;
+        }
+        .carousel-nav span.active {
+            background: white;
+        }
+        /* 右侧列表区域 */
+        .list-section {
+            flex: 1;
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .list-section h2 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #333;
+            border-left: 4px solid #409EFF;
+            padding-left: 10px;
+        }
+        .db-list {
+            list-style: none;
+        }
+        .db-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .db-list li:last-child {
+            border-bottom: none;
+        }
+        .db-list li a {
+            text-decoration: none;
+            color: #333;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .db-list li a:hover {
+            color: #409EFF;
+        }
+        .db-list li a::before {
+            content: "📚";
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <!-- 左侧：IT新闻轮播 -->
+        <div class="carousel-section">
+            <div class="carousel">
+                <!-- 轮播项1 -->
+                <a href="https://example.com/news1" class="carousel-item active">
+                    <img src="https://picsum.photos/id/0/800/400" alt="IT新闻1">
+                    <div class="carousel-caption">
+                        <h3>高并发中Poll、Epoll、Future的概念</h3>
+                        <p>高并发中有几个重要概念：Poll、Epoll、Future。</p>
+                    </div>
+                </a>
+                <!-- 轮播项2 -->
+                <a href="https://example.com/news2" class="carousel-item">
+                    <img src="https://picsum.photos/id/1/800/400" alt="IT新闻2">
+                    <div class="carousel-caption">
+                        <h3>AI大模型在数据库优化中的应用</h3>
+                        <p>AI技术如何助力数据库性能调优与自动化运维。</p>
+                    </div>
+                </a>
+                <!-- 轮播项3 -->
+                <a href="https://example.com/news3" class="carousel-item">
+                    <img src="https://picsum.photos/id/2/800/400" alt="IT新闻3">
+                    <div class="carousel-caption">
+                        <h3>云原生数据库发展趋势</h3>
+                        <p>2025年云数据库市场格局与技术演进方向。</p>
+                    </div>
+                </a>
+                <!-- 轮播导航点 -->
+                <div class="carousel-nav">
+                    <span class="active" data-index="0"></span>
+                    <span data-index="1"></span>
+                    <span data-index="2"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧：数据库学习列表 -->
+        <div class="list-section">
+            <h2>数据库学习头条</h2>
+            <ul class="db-list">
+                <li><a href="https://example.com/db1">MySQL 基础入门：从安装到增删改查</a></li>
+                <li><a href="https://example.com/db2">PostgreSQL 高级特性：JSON 数据类型实战</a></li>
+                <li><a href="https://example.com/db3">MongoDB 文档数据库核心概念与操作</a></li>
+                <li><a href="https://example.com/db4">Redis 缓存数据库：高性能键值存储实战</a></li>
+                <li><a href="https://example.com/db5">SQL 语句优化：慢查询分析与索引设计</a></li>
+                <li><a href="https://example.com/db6">数据库事务与 ACID 特性深入理解</a></li>
+                <li><a href="https://example.com/db7">MySQL 主从复制与读写分离架构实践</a></li>
+                <li><a href="https://example.com/db8">NoSQL 与 SQL 数据库选型对比与适用场景</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 轮播JS逻辑 -->
+    <script>
+        const items = document.querySelectorAll('.carousel-item');
+        const navs = document.querySelectorAll('.carousel-nav span');
+        let currentIndex = 0;
+
+        function showSlide(index) {
+            items.forEach(item => item.classList.remove('active'));
+            navs.forEach(nav => nav.classList.remove('active'));
+            items[index].classList.add('active');
+            navs[index].classList.add('active');
+            currentIndex = index;
+        }
+
+        // 自动轮播
+        setInterval(() => {
+            let nextIndex = (currentIndex + 1) % items.length;
+            showSlide(nextIndex);
+        }, 4000);
+
+        // 点击导航点切换
+        navs.forEach(nav => {
+            nav.addEventListener('click', () => {
+                showSlide(parseInt(nav.dataset.index));
+            });
+        });
+    </script>
+</body>
+</html>

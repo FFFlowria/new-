@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据库刷题平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft Yahei", sans-serif;
+        }
+        body {
+            background-color: #f5f7fa;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            gap: 20px;
+        }
+        /* 左侧：统计与排行榜 */
+        .sidebar {
+            width: 320px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        .stats-card, .rank-card {
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .stats-card:last-child, .rank-card:last-child {
+            border-bottom: none;
+        }
+        .stats-card h3, .rank-card h3 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .stats-card h3::before {
+            content: "📊";
+            font-size: 18px;
+        }
+        .rank-card h3::before {
+            content: "🏆";
+            font-size: 18px;
+        }
+        .stats-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        .stats-item .label {
+            color: #666;
+        }
+        .stats-item .value {
+            color: #409EFF;
+            font-weight: bold;
+        }
+        .rank-list {
+            list-style: none;
+        }
+        .rank-list li {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .rank-list li:last-child {
+            border-bottom: none;
+        }
+        .rank-no {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #409EFF;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            margin-right: 10px;
+        }
+        .rank-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            margin-right: 10px;
+            overflow: hidden;
+        }
+        .rank-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .rank-name {
+            flex: 1;
+            font-size: 14px;
+            color: #333;
+        }
+        .rank-score {
+            font-size: 14px;
+            color: #999;
+        }
+
+        /* 右侧：题库主区域 */
+        .main-content {
+            flex: 1;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        .filter-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .filter-bar h3 {
+            font-size: 16px;
+            color: #333;
+            margin-right: 10px;
+        }
+        .filter-btn {
+            padding: 6px 16px;
+            border: 1px solid #dcdfe6;
+            border-radius: 4px;
+            background: white;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .filter-btn:hover {
+            border-color: #409EFF;
+            color: #409EFF;
+        }
+        .filter-btn.active {
+            background: #409EFF;
+            color: white;
+            border-color: #409EFF;
+        }
+        .search-box {
+            margin-left: auto;
+            position: relative;
+        }
+        .search-box input {
+            padding: 6px 12px 6px 30px;
+            border: 1px solid #dcdfe6;
+            border-radius: 4px;
+            width: 200px;
+        }
+        .search-box::before {
+            content: "🔍";
+            position: absolute;
+            left: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+        }
+
+        /* 题库列表 */
+        .problem-list {
+            list-style: none;
+        }
+        .problem-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .problem-item:last-child {
+            border-bottom: none;
+        }
+        .problem-no {
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            margin-right: 12px;
+            color: white;
+        }
+        .easy { background: #67c23a; } /* 简单 - 绿色 */
+        .medium { background: #e6a23c; } /* 中等 - 橙色 */
+        .hard { background: #f56c6c; } /* 困难 - 红色 */
+        .problem-title {
+            flex: 1;
+            font-size: 15px;
+            color: #333;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .problem-title:hover {
+            color: #409EFF;
+            text-decoration: underline;
+        }
+        .problem-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 12px;
+            color: #999;
+        }
+        .difficulty {
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: white;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 左侧：我的刷题统计 + 排行榜 -->
+        <div class="sidebar">
+            <div class="stats-card">
+                <h3>我的刷题统计</h3>
+                <div class="stats-item">
+                    <span class="label">总题数</span>
+                    <span class="value">50/50</span>
+                </div>
+                <div class="stats-item">
+                    <span class="label">已完成</span>
+                    <span class="value">12</span>
+                </div>
+                <div class="stats-item">
+                    <span class="label">通过率</span>
+                    <span class="value">24%</span>
+                </div>
+                <div class="stats-item">
+                    <span class="label">累计时长</span>
+                    <span class="value">3.2 小时</span>
+                </div>
+                <div class="stats-item">
+                    <span class="label">排名</span>
+                    <span class="value">第 999+ 名</span>
+                </div>
+            </div>
+
+            <div class="rank-card">
+                <h3>排行榜</h3>
+                <ul class="rank-list">
+                    <li>
+                        <div class="rank-no">1</div>
+                        <div class="rank-avatar"><img src="https://picsum.photos/id/1001/32/32" alt="头像"></div>
+                        <div class="rank-name">sule</div>
+                        <div class="rank-score">2695题</div>
+                    </li>
+                    <li>
+                        <div class="rank-no">2</div>
+                        <div class="rank-avatar"><img src="https://picsum.photos/id/1002/32/32" alt="头像"></div>
+                        <div class="rank-name">朱言 午</div>
+                        <div class="rank-score">2597题</div>
+                    </li>
+                    <li>
+                        <div class="rank-no">3</div>
+                        <div class="rank-avatar"><img src="https://picsum.photos/id/1003/32/32" alt="头像"></div>
+                        <div class="rank-name">wen</div>
+                        <div class="rank-score">2340题</div>
+                    </li>
+                    <li>
+                        <div class="rank-no">4</div>
+                        <div class="rank-avatar"><img src="https://picsum.photos/id/1004/32/32" alt="头像"></div>
+                        <div class="rank-name">想睡到第三名</div>
+                        <div class="rank-score">2111题</div>
+                    </li>
+                    <li>
+                        <div class="rank-no">5</div>
+                        <div class="rank-avatar"><img src="https://picsum.photos/id/1005/32/32" alt="头像"></div>
+                        <div class="rank-name">注何</div>
+                        <div class="rank-score">1600题</div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 右侧：题库区域 -->
+        <div class="main-content">
+            <div class="filter-bar">
+                <h3>难度分类：</h3>
+                <button class="filter-btn active">全部</button>
+                <button class="filter-btn">简单</button>
+                <button class="filter-btn">中等</button>
+                <button class="filter-btn">困难</button>
+                <div class="search-box">
+                    <input type="text" placeholder="请输入题目名称搜索">
+                </div>
+            </div>
+
+            <ul class="problem-list">
+                <!-- 简单题 1-15 -->
+                <li class="problem-item"><div class="problem-no easy">1</div><a href="#" class="problem-title">MySQL 基础：创建数据库并指定字符集</a><div class="problem-meta"><span class="difficulty easy">简单</span><span>基础</span></div></li>
+                <li class="problem-item"><div class="problem-no easy">2</div><a href="#" class="problem-title">MySQL 基础：删除数据库</a><div class="problem-meta"><span class="difficulty easy">简单</span><span>基础</span></div></li>
+                <li class="problem-item"><div class="problem-no easy">3</div><a href="#" class="problem-title">MySQL 基础：创建员工表（含主键/自增）</a><div class="problem-meta"><span class="difficulty easy">简单</span><span>DDL</span></div></li>
+                <li class="problem-item"><div class="problem-no easy">4</div><a href="#" class="problem-title">MySQL 基础：为表添加昵称字段</a><div class="problem-meta"><span class="difficulty easy">简单</span><span>DDL</span></div></li>
+                <li class="problem-item"><div class="problem-no easy">5</div><a href="#" class="problem-title">MySQL 基础：修改表字段名与类型</a><div class="problem-meta"><span class="difficulty easy">简单</span><span>DDL</span></div></li>
+                <li class="problem-item"><div class="problem-no easy">6</div><a href="#" class="problem-title">MySQL 基础：删除表字段</a><div class="problem-meta"><span class="difficulty easy">简单</span><span>DDL</span></div></li>
+                <li class="problem-item"><div class="problem-no easy">7</div><a href="#" class="problem-title">MySQL 基础：表重命名</a><div class="problem-meta"><span class="difficulty easy">简单</span><span>DDL</span></div></li>
+                <li class="problem-item"><div class="problem-no easy">8</div><a href="#" class="problem-title">MySQL 基础：清空表数据（TRUNCATE）</a><div class="problem-meta"><span class="difficulty easy">简单</span><span>DML</span></div></li>
+                <li class="problem-item"><div class="problem-no easy">9</div><a href="#" class="problem-title">MySQL 基础：单条数据插入</a><div class="problem-meta"><span class="difficulty easy">简单</span><span>DML</span></div></li>
+                <li class="problem-item"><div class="problem-no easy">10</div><a href="#" class="problem-title">MySQL 基础：批量插入员工数据</a><div class="problem-meta"><span class="difficulty easy">简单</span><span>DML</span></div></li>
+                <li class="problem-item"><div class="problem-no easy">11</div><a href="#" class="problem-title">MySQL 基础：修改指定员工姓名</a><div class="problem-meta"><span class="difficulty easy">简单</span><span>DML</span></div></li>
+                <li class="problem-item"><div class="problem-no easy">12</div><a href="#" class="problem-title">MySQL 基础：删除女性员工记录</a><div class="problem-meta"><span class="difficulty easy">简单</span><span>DML</span></div></li>
+                <li class="problem-item"><div class="problem-no easy">13</div><a href="#" class="problem-title">MySQL 基础：查询所有员工信息</a><div class="problem-meta"><span class="difficulty easy">简单</span><span>DQL</span></div></li>
+                <li class="problem-item"><div class="problem-no easy">14</div><a href="#" class="problem-title">MySQL 基础：查询指定字段（姓名/地址/年龄）</a><div class="problem-meta"><span class="difficulty easy">简单</span><span>DQL</span></div></li>
+                <li class="problem-item"><div class="problem-no easy">15</div><a href="#" class="problem-title">MySQL 基础：查询不重复的工作地址</a><div class="problem-meta"><span class="difficulty easy">简单</span><span>DQL</span></div></li>
+
+                <!-- 中等题 16-35 -->
+                <li class="problem-item"><div class="problem-no medium">16</div><a href="#" class="problem-title">MySQL 进阶：查询年龄30岁及以下员工</a><div class="problem-meta"><span class="difficulty medium">中等</span><span>过滤</span></div></li>
+                <li class="problem-item"><div class="problem-no medium">17</div><a href="#" class="problem-title">MySQL 进阶：查询姓“张”的员工</a><div class="problem-meta"><span class="difficulty medium">中等</span><span>模糊查询</span></div></li>
+                <li class="problem-item"><div class="problem-no medium">18</div><a href="#" class="problem-title">MySQL 进阶：按年龄降序排序员工</a><div class="problem-meta"><span class="difficulty medium">中等</span><span>排序</span></div></li>
+                <li class="problem-item"><div class="problem-no medium">19</div><a href="#" class="problem-title">MySQL 进阶：查询前5条最新入职员工</a><div class="
